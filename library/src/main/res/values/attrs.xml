@@ -3,26 +3,26 @@
 
     <!-- Components -->
     <declare-styleable name="ScToggleButton">
-        <attr name="scc_selected" format="boolean" />
-        <attr name="scc_font_family" format="string" />
-        <attr name="scc_font_size" format="dimension" />
-        <attr name="scc_font_bold" format="boolean" />
-        <attr name="scc_font_italic" format="boolean" />
-        <attr name="scc_stroke_size" format="dimension" />
-        <attr name="scc_text" format="string" />
-        <attr name="scc_text_align" />
-        <attr name="scc_corner_radius" format="dimension" />
-        <attr name="scc_on_color" format="color" />
-        <attr name="scc_off_color" format="color" />
-        <attr name="scc_highlight_color" format="color" />
-        <attr name="scc_change_border" format="boolean" />
-        <attr name="scc_change_text" format="boolean" />
-        <attr name="scc_group" format="string" />
-        <attr name="scc_always_one" format="boolean" />
-        <attr name="scc_all_caps" format="boolean" />
+        <attr name="selected" format="boolean" />
+        <attr name="fontFamily" format="string" />
+        <attr name="fontSize" format="dimension" />
+        <attr name="bold" format="boolean" />
+        <attr name="italic" format="boolean" />
+        <attr name="allCaps" format="boolean" />
+        <attr name="strokeSize" format="dimension" />
+        <attr name="text" format="string" />
+        <attr name="align" />
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="onColor" format="color" />
+        <attr name="offColor" format="color" />
+        <attr name="highlightColor" format="color" />
+        <attr name="changeBorder" format="boolean" />
+        <attr name="changeText" format="boolean" />
+        <attr name="group" format="string" />
+        <attr name="alwaysOneSelected" format="boolean" />
     </declare-styleable>
 
-    <attr name="scc_text_align" format="enum">
+    <attr name="align" format="enum">
         <enum name="left" value="0"/>
         <enum name="center" value="1"/>
         <enum name="right" value="2"/>

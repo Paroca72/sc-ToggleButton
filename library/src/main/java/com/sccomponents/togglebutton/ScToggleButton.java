@@ -38,7 +38,7 @@ public class ScToggleButton extends View {
     private static final int MIN_WIDTH = 96;
     private static final int MIN_HEIGHT = 48;
 
-    private static final int CORNER_RADIUS = 10;
+    private static final int CORNER_RADIUS = 5;
     private static final int FONT_SIZE = 14;
     private static final int STROKE_SIZE = 2;
 
@@ -155,49 +155,50 @@ public class ScToggleButton extends View {
                 .obtainStyledAttributes(attrs, R.styleable.ScToggleButton, defStyle, 0);
 
         boolean isSelected = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_selected, false);
+                R.styleable.ScToggleButton_selected, false);
 
         this.mFontSize = attrArray.getDimension(
-                R.styleable.ScToggleButton_scc_font_size,
+                R.styleable.ScToggleButton_fontSize,
                 this.dipToPixel(ScToggleButton.FONT_SIZE));
         this.mFontFamily = attrArray.getString(
-                R.styleable.ScToggleButton_scc_font_family);
+                R.styleable.ScToggleButton_fontFamily);
         this.mFontIsBold = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_font_bold, true);
+
+                R.styleable.ScToggleButton_bold, true);
         this.mFontIsItalic = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_font_italic, false);
+                R.styleable.ScToggleButton_italic, false);
+        this.mAllCaps = attrArray.getBoolean(
+                R.styleable.ScToggleButton_allCaps, true);
 
         this.mCornerRadius = attrArray.getDimension(
-                R.styleable.ScToggleButton_scc_corner_radius,
+                R.styleable.ScToggleButton_cornerRadius,
                 this.dipToPixel(ScToggleButton.CORNER_RADIUS));
         this.mStrokeSize = attrArray.getDimension(
-                R.styleable.ScToggleButton_scc_stroke_size,
+                R.styleable.ScToggleButton_strokeSize,
                 this.dipToPixel(ScToggleButton.STROKE_SIZE));
 
         this.mText = attrArray.getString(
-                R.styleable.ScToggleButton_scc_text);
+                R.styleable.ScToggleButton_text);
         int textAlign = attrArray.getInt(
-                R.styleable.ScToggleButton_scc_text_align, TextAlign.CENTER.ordinal());
+                R.styleable.ScToggleButton_align, TextAlign.CENTER.ordinal());
         this.mTextAlign = TextAlign.values()[textAlign];
-        this.mAllCaps = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_all_caps, true);
 
         this.mOffColor = attrArray.getColor(
-                R.styleable.ScToggleButton_scc_off_color, Color.parseColor("#3F51B5"));
+                R.styleable.ScToggleButton_offColor, Color.parseColor("#3F51B5"));
         this.mOnColor = attrArray.getColor(
-                R.styleable.ScToggleButton_scc_on_color, Color.parseColor("#45AA46"));
+                R.styleable.ScToggleButton_onColor, Color.parseColor("#45AA46"));
         this.mHighlightColor = attrArray.getColor(
-                R.styleable.ScToggleButton_scc_highlight_color, -1);
+                R.styleable.ScToggleButton_highlightColor, -1);
 
         this.mChangeBorderColorOnChecked = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_change_border, true);
+                R.styleable.ScToggleButton_changeBorder, true);
         this.mChangeTextColorOnChecked = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_change_text, true);
+                R.styleable.ScToggleButton_changeText, true);
 
         this.mGroup = attrArray.getString(
-                R.styleable.ScToggleButton_scc_group);
+                R.styleable.ScToggleButton_group);
         this.mAlwaysOneSelectedPerGroup = attrArray.getBoolean(
-                R.styleable.ScToggleButton_scc_always_one, true);
+                R.styleable.ScToggleButton_alwaysOneSelected, true);
 
         // Recycle
         attrArray.recycle();

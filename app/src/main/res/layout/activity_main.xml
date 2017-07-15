@@ -8,57 +8,14 @@
     android:orientation="vertical"
     tools:context="com.sccomponents.togglebutton.demo.MainActivity">
 
-    <LinearLayout
+    <com.sccomponents.togglebutton.ScToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <com.sccomponents.togglebutton.ScToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            app:scc_change_border="false"
-            app:scc_highlight_color="@color/colorAccent"
-            app:scc_font_size="12sp"
-            app:scc_text="TEST TEST TEST" />
-
-        <com.sccomponents.togglebutton.ScToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:scc_group="GRUPPO 1"
-            app:scc_text="TEST" />
-
-        <com.sccomponents.togglebutton.ScToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:scc_group="GRUPPO 1"
-            app:scc_text="TEST" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <com.sccomponents.togglebutton.ScToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:scc_group="GRUPPO 2"
-            app:scc_text="TEST" />
-
-        <com.sccomponents.togglebutton.ScToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:scc_group="GRUPPO 2"
-            app:scc_text="TEST" />
-
-        <com.sccomponents.togglebutton.ScToggleButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:scc_group="GRUPPO 2"
-            app:scc_text="TEST" />
-
-    </LinearLayout>
+        android:padding="10dp"
+        app:changeBorder="false"
+        app:bold="false"
+        app:fontSize="12sp"
+        app:highlightColor="@color/colorAccent"
+        app:text="TEST TEST TEST" />
 
 </LinearLayout>
