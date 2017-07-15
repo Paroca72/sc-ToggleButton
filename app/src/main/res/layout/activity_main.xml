@@ -17,6 +17,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
+            app:scc_change_border="false"
+            app:scc_highlight_color="@color/colorAccent"
             app:scc_font_size="12sp"
             app:scc_text="TEST TEST TEST" />
 

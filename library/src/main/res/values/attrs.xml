@@ -19,6 +19,7 @@
         <attr name="scc_change_text" format="boolean" />
         <attr name="scc_group" format="string" />
         <attr name="scc_always_one" format="boolean" />
+        <attr name="scc_all_caps" format="boolean" />
     </declare-styleable>
 
     <attr name="scc_text_align" format="enum">

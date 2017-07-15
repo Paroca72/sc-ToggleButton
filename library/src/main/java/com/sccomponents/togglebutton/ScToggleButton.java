@@ -72,6 +72,7 @@ public class ScToggleButton extends View {
 
     protected String mText = null;
     protected TextAlign mTextAlign = TextAlign.CENTER;
+    protected boolean mAllCaps = true;
 
     protected int mOffColor = Color.parseColor("#3F51B5");
     protected int mOnColor = Color.parseColor("#45AA46");
@@ -178,11 +179,13 @@ public class ScToggleButton extends View {
         int textAlign = attrArray.getInt(
                 R.styleable.ScToggleButton_scc_text_align, TextAlign.CENTER.ordinal());
         this.mTextAlign = TextAlign.values()[textAlign];
+        this.mAllCaps = attrArray.getBoolean(
+                R.styleable.ScToggleButton_scc_all_caps, true);
 
         this.mOffColor = attrArray.getColor(
-                R.styleable.ScToggleButton_scc_on_color, Color.parseColor("#3F51B5"));
+                R.styleable.ScToggleButton_scc_off_color, Color.parseColor("#3F51B5"));
         this.mOnColor = attrArray.getColor(
-                R.styleable.ScToggleButton_scc_off_color, Color.parseColor("#45AA46"));
+                R.styleable.ScToggleButton_scc_on_color, Color.parseColor("#45AA46"));
         this.mHighlightColor = attrArray.getColor(
                 R.styleable.ScToggleButton_scc_highlight_color, -1);
 
@@ -296,7 +299,6 @@ public class ScToggleButton extends View {
 
     /**
      * Get back the border color by the current state
-     *
      * @return the color
      */
     private int choiceBorderColor() {
@@ -308,12 +310,22 @@ public class ScToggleButton extends View {
 
     /**
      * Get back the text color by the current state
-     *
      * @return the color
      */
     private int choiceTextColor() {
         if (this.mChangeTextColorOnChecked && this.isSelected())
             return this.mOnColor;
+        else
+            return this.mOffColor;
+    }
+
+    /**
+     * Get back the highlight color by the current state
+     * @return the color
+     */
+    private int choiceHighlightColor() {
+        if (this.isSelected())
+            return this.mHighlightColor == -1 ? this.mOnColor: this.mHighlightColor;
         else
             return this.mOffColor;
     }
@@ -374,7 +386,7 @@ public class ScToggleButton extends View {
 
         // Get all buttons in groups
         List<ScToggleButton> groups = this.filterGroup(this.getGroup());
-        if (groups.size() > 0) {
+        if (groups.size() > 1) {
             // If status is true reset all other buttons
             if (this.isSelected())
                 this.resetGroup(groups);
@@ -447,7 +459,7 @@ public class ScToggleButton extends View {
      */
     private void drawHighlight(Canvas canvas) {
         // Setting the painter
-        this.mHighlightPaint.setColor(this.choiceBorderColor());
+        this.mHighlightPaint.setColor(this.choiceHighlightColor());
         this.mHighlightPaint.setStrokeWidth(this.mStrokeSize * 2);
         this.mHighlightPaint.setMaskFilter(this.isSelected() ? this.mHighLightEffect : null);
 
@@ -505,7 +517,8 @@ public class ScToggleButton extends View {
 
             // Create the text layout
             StaticLayout staticLayout = new StaticLayout(
-                    this.mText, this.mTextPaint,
+                    this.mAllCaps ? this.mText.toUpperCase(): this.mText,
+                    this.mTextPaint,
                     area.width(), align,
                     1, 0, false
             );
@@ -626,6 +639,7 @@ public class ScToggleButton extends View {
 
         state.putString("mText", this.mText);
         state.putInt("mTextAlign", this.mTextAlign.ordinal());
+        state.putBoolean("mAllCaps", this.mAllCaps);
 
         state.putInt("mOffColor", this.mOffColor);
         state.putInt("mOnColor", this.mOnColor);
@@ -666,6 +680,7 @@ public class ScToggleButton extends View {
 
         this.mText = savedState.getString("mText");
         this.mTextAlign = TextAlign.values()[savedState.getInt("mTextAlign")];
+        this.mAllCaps = savedState.getBoolean("mAllCaps");
 
         this.mOffColor = savedState.getInt("mOffColor");
         this.mOnColor = savedState.getInt("mOnColor");
@@ -916,6 +931,30 @@ public class ScToggleButton extends View {
             this.invalidate();
         }
     }
+
+    /**
+     * Get the all caps text status
+     *
+     * @return true if all caps
+     */
+    @SuppressWarnings("unused")
+    public boolean getAllCaps() {
+        return this.mAllCaps;
+    }
+
+    /**
+     * Set the text as all caps.
+     *
+     * @param value if true all caps
+     */
+    @SuppressWarnings("unused")
+    public void setAllCaps(boolean value) {
+        if (this.mAllCaps != value) {
+            this.mAllCaps = value;
+            this.invalidate();
+        }
+    }
+
 
 
     /**
