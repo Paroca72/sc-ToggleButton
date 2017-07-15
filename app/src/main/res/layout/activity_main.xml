@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.sccomponents.togglebutton.demo.MainActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.sccomponents.togglebutton.ScToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            app:scc_font_size="12sp"
+            app:scc_text="TEST TEST TEST" />
+
+        <com.sccomponents.togglebutton.ScToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:scc_group="GRUPPO 1"
+            app:scc_text="TEST" />
+
+        <com.sccomponents.togglebutton.ScToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:scc_group="GRUPPO 1"
+            app:scc_text="TEST" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.sccomponents.togglebutton.ScToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:scc_group="GRUPPO 2"
+            app:scc_text="TEST" />
+
+        <com.sccomponents.togglebutton.ScToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:scc_group="GRUPPO 2"
+            app:scc_text="TEST" />
+
+        <com.sccomponents.togglebutton.ScToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:scc_group="GRUPPO 2"
+            app:scc_text="TEST" />
+
+    </LinearLayout>
+
+</LinearLayout>

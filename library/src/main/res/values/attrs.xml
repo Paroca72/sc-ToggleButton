@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Components -->
+    <declare-styleable name="ScToggleButton">
+        <attr name="scc_selected" format="boolean" />
+        <attr name="scc_font_family" format="string" />
+        <attr name="scc_font_size" format="dimension" />
+        <attr name="scc_font_bold" format="boolean" />
+        <attr name="scc_font_italic" format="boolean" />
+        <attr name="scc_stroke_size" format="dimension" />
+        <attr name="scc_text" format="string" />
+        <attr name="scc_text_align" />
+        <attr name="scc_corner_radius" format="dimension" />
+        <attr name="scc_on_color" format="color" />
+        <attr name="scc_off_color" format="color" />
+        <attr name="scc_highlight_color" format="color" />
+        <attr name="scc_change_border" format="boolean" />
+        <attr name="scc_change_text" format="boolean" />
+        <attr name="scc_group" format="string" />
+        <attr name="scc_always_one" format="boolean" />
+    </declare-styleable>
+
+    <attr name="scc_text_align" format="enum">
+        <enum name="left" value="0"/>
+        <enum name="center" value="1"/>
+        <enum name="right" value="2"/>
+    </attr>
+
+</resources>
