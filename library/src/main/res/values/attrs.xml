@@ -9,23 +9,32 @@
         <attr name="bold" format="boolean" />
         <attr name="italic" format="boolean" />
         <attr name="allCaps" format="boolean" />
+        <attr name="showLed" format="boolean" />
         <attr name="strokeSize" format="dimension" />
         <attr name="text" format="string" />
         <attr name="align" />
         <attr name="cornerRadius" format="dimension" />
         <attr name="onColor" format="color" />
         <attr name="offColor" format="color" />
-        <attr name="highlightColor" format="color" />
+        <attr name="ledColor" format="color" />
         <attr name="changeBorder" format="boolean" />
         <attr name="changeText" format="boolean" />
         <attr name="group" format="string" />
-        <attr name="alwaysOneSelected" format="boolean" />
+        <attr name="onlyOneSelected" format="boolean" />
+        <attr name="fillMode" />
     </declare-styleable>
 
     <attr name="align" format="enum">
-        <enum name="left" value="0"/>
-        <enum name="center" value="1"/>
-        <enum name="right" value="2"/>
+        <enum name="left" value="0" />
+        <enum name="center" value="1" />
+        <enum name="right" value="2" />
+    </attr>
+
+    <attr name="fillMode" format="enum">
+        <enum name="never" value="0" />
+        <enum name="always" value="1" />
+        <enum name="on" value="2" />
+        <enum name="off" value="3" />
     </attr>
 
 </resources>

@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.text.Layout;
@@ -43,19 +42,31 @@ public class ScToggleButton extends View {
     private static final int STROKE_SIZE = 2;
 
     private static List<ScToggleButton> mGlobalButtons = null;
+    private static OnGroupChangeListener mGroupChangeListener = null;
 
 
     // ***************************************************************************************
     // Enumerators
 
     /**
-     * The area filling types.
+     * The text alignment.
      */
     @SuppressWarnings("unuse")
     public enum TextAlign {
         LEFT,
         CENTER,
         RIGHT
+    }
+
+    /**
+     * The filling mode.
+     */
+    @SuppressWarnings("unuse")
+    public enum FillMode {
+        NEVER,
+        ALWAYS,
+        ON,
+        OFF
     }
 
 
@@ -69,20 +80,22 @@ public class ScToggleButton extends View {
 
     protected float mStrokeSize = ScToggleButton.STROKE_SIZE;
     protected float mCornerRadius = this.dipToPixel(ScToggleButton.CORNER_RADIUS);
+    protected FillMode mFillMode = FillMode.NEVER;
 
     protected String mText = null;
     protected TextAlign mTextAlign = TextAlign.CENTER;
     protected boolean mAllCaps = true;
+    protected boolean mShowLed = true;
 
     protected int mOffColor = Color.parseColor("#3F51B5");
     protected int mOnColor = Color.parseColor("#45AA46");
-    protected int mHighlightColor = -1;
+    protected int mLedColor = -1;
 
     protected boolean mChangeBorderColorOnChecked = true;
     protected boolean mChangeTextColorOnChecked = true;
 
     protected String mGroup = null;
-    protected boolean mAlwaysOneSelectedPerGroup = true;
+    protected boolean mOnlyOneSelected = true;
 
 
     // ***************************************************************************************
@@ -92,7 +105,6 @@ public class ScToggleButton extends View {
     private OnChangeListener mChangeListener = null;
 
     // Painters
-    private Paint mBackgroundPaint = null;
     private Paint mStrokePaint = null;
     private Paint mHighlightPaint = null;
     private BlurMaskFilter mHighLightEffect = null;
@@ -169,6 +181,8 @@ public class ScToggleButton extends View {
                 R.styleable.ScToggleButton_italic, false);
         this.mAllCaps = attrArray.getBoolean(
                 R.styleable.ScToggleButton_allCaps, true);
+        this.mShowLed = attrArray.getBoolean(
+                R.styleable.ScToggleButton_showLed, true);
 
         this.mCornerRadius = attrArray.getDimension(
                 R.styleable.ScToggleButton_cornerRadius,
@@ -176,6 +190,9 @@ public class ScToggleButton extends View {
         this.mStrokeSize = attrArray.getDimension(
                 R.styleable.ScToggleButton_strokeSize,
                 this.dipToPixel(ScToggleButton.STROKE_SIZE));
+        int fillMode = attrArray.getInt(
+                R.styleable.ScToggleButton_fillMode, FillMode.NEVER.ordinal());
+        this.mFillMode = FillMode.values()[fillMode];
 
         this.mText = attrArray.getString(
                 R.styleable.ScToggleButton_text);
@@ -187,8 +204,8 @@ public class ScToggleButton extends View {
                 R.styleable.ScToggleButton_offColor, Color.parseColor("#3F51B5"));
         this.mOnColor = attrArray.getColor(
                 R.styleable.ScToggleButton_onColor, Color.parseColor("#45AA46"));
-        this.mHighlightColor = attrArray.getColor(
-                R.styleable.ScToggleButton_highlightColor, -1);
+        this.mLedColor = attrArray.getColor(
+                R.styleable.ScToggleButton_ledColor, -1);
 
         this.mChangeBorderColorOnChecked = attrArray.getBoolean(
                 R.styleable.ScToggleButton_changeBorder, true);
@@ -197,8 +214,8 @@ public class ScToggleButton extends View {
 
         this.mGroup = attrArray.getString(
                 R.styleable.ScToggleButton_group);
-        this.mAlwaysOneSelectedPerGroup = attrArray.getBoolean(
-                R.styleable.ScToggleButton_alwaysOneSelected, true);
+        this.mOnlyOneSelected = attrArray.getBoolean(
+                R.styleable.ScToggleButton_onlyOneSelected, true);
 
         // Recycle
         attrArray.recycle();
@@ -211,15 +228,9 @@ public class ScToggleButton extends View {
 
         this.mDetector = new GestureDetector(this.getContext(), new SingleTapConfirm());
 
-        this.mBackgroundPaint = new Paint();
-        this.mBackgroundPaint.setAntiAlias(true);
-        this.mBackgroundPaint.setDither(true);
-        this.mBackgroundPaint.setStyle(Paint.Style.FILL);
-
         this.mStrokePaint = new Paint();
         this.mStrokePaint.setAntiAlias(true);
         this.mStrokePaint.setDither(true);
-        this.mStrokePaint.setStyle(Paint.Style.STROKE);
 
         this.mHighlightPaint = new Paint();
         this.mHighlightPaint.setAntiAlias(true);
@@ -275,31 +286,26 @@ public class ScToggleButton extends View {
      * @param str2 second
      * @return true if equal
      */
-    public boolean equals(String str1, String str2) {
+    public static boolean equals(String str1, String str2) {
         return str1 == null ? str2 == null : str1.equals(str2);
     }
 
     /**
-     * Manage the click event
+     * Check if the component background if filled
      */
-    private void fireClick() {
-        // Holder
-        boolean oldStatus = this.isSelected();
-
-        // Toggle the current selected state
-        this.setSelected(!this.isSelected());
-        this.invalidate();
-
-        // Check the groups
-        this.manageGroup();
-
-        // If changed throw the event
-        if (oldStatus != this.isSelected() && this.mChangeListener != null)
-            this.mChangeListener.onChanged(this.isSelected());
+    private boolean isFilled() {
+        switch (this.mFillMode) {
+            case ALWAYS: return true;
+            case NEVER: return false;
+            case ON: return this.isSelected();
+            case OFF: return !this.isSelected();
+        }
+        return false;
     }
 
     /**
      * Get back the border color by the current state
+     *
      * @return the color
      */
     private int choiceBorderColor() {
@@ -310,25 +316,36 @@ public class ScToggleButton extends View {
     }
 
     /**
+     * If the same color of background choice the other color
+     */
+    private int inverseColor(int color) {
+        int backgroundColor = this.choiceBorderColor();
+        if (this.isFilled() && color == backgroundColor)
+            return color == this.mOnColor ? this.mOffColor: this.mOnColor;
+        else
+            return color;
+    }
+
+    /**
      * Get back the text color by the current state
+     *
      * @return the color
      */
     private int choiceTextColor() {
-        if (this.mChangeTextColorOnChecked && this.isSelected())
-            return this.mOnColor;
-        else
-            return this.mOffColor;
+        int color = this.mChangeTextColorOnChecked && this.isSelected() ?
+                this.mOnColor: this.mOffColor;
+        return this.inverseColor(color);
     }
 
     /**
      * Get back the highlight color by the current state
+     *
      * @return the color
      */
     private int choiceHighlightColor() {
-        if (this.isSelected())
-            return this.mHighlightColor == -1 ? this.mOnColor: this.mHighlightColor;
-        else
-            return this.mOffColor;
+        int color = this.mLedColor == -1 ? this.mOnColor : this.mLedColor;
+        color = this.isSelected() ? color: this.mOffColor;
+        return this.inverseColor(color);
     }
 
 
@@ -341,88 +358,99 @@ public class ScToggleButton extends View {
      * @param group Group name
      * @return a list of buttons
      */
-    private List<ScToggleButton> filterGroup(String group) {
+    @SuppressWarnings("unused")
+    public static List<ScToggleButton> getButtonsGroup(String group) {
         List<ScToggleButton> list = new ArrayList<>();
-        for (ScToggleButton button : ScToggleButton.mGlobalButtons) {
-            if (this.equals(button.getGroup(), group))
-                list.add(button);
-        }
+        if (group != null && group.length() > 0)
+            for (ScToggleButton button : ScToggleButton.mGlobalButtons) {
+                if (ScToggleButton.equals(button.getGroup(), group))
+                    list.add(button);
+            }
         return list;
+    }
+
+    /**
+     * Check if the button belongs to a group
+     *
+     * @return true if within a group
+     */
+    @SuppressWarnings("unused")
+    public boolean hasGroup() {
+        return this.getGroup() != null && this.getGroup().length() > 0;
     }
 
     /**
      * Reset the group selection.
      */
-    private void resetGroup(List<ScToggleButton> groups) {
+    @SuppressWarnings("unused")
+    public static void resetGroup(String group, ScToggleButton excluded) {
+        // Get all buttons in groups
+        List<ScToggleButton> list = ScToggleButton.getButtonsGroup(group);
+
         // If status is true reset all other buttons
-        for (ScToggleButton button : groups)
-            if (button != this)
+        for (ScToggleButton button : list)
+            if (excluded == null || button != excluded)
                 button.setSelected(false);
     }
 
     /**
-     * Check if need to have at least one button selected in this group.
+     * Reset the group selection.
      */
-    private boolean needToForceSelection(List<ScToggleButton> groups) {
-        // Check for empty group
-        if (!this.mAlwaysOneSelectedPerGroup)
-            return false;
-
-        // Check if have at least one button selected
-        for (ScToggleButton button : groups)
-            if (button.isSelected())
-                return false;
-
-        // Else need to select one
-        return true;
+    @SuppressWarnings("unused")
+    public static void resetGroup(String group) {
+        ScToggleButton.resetGroup(group, null);
     }
 
     /**
-     * Update the group status.
+     * Get back the selected buttons list inside the group
      */
-    private void manageGroup() {
-        // Check for empty group
-        if (this.getGroup() == null)
+    @SuppressWarnings("unused")
+    public static ScToggleButton[] getGroupSelection(String group) {
+        // Get all buttons in groups
+        List<ScToggleButton> list = ScToggleButton.getButtonsGroup(group);
+
+        // Check if have at least one button selected
+        List<ScToggleButton> selected = new ArrayList<>();
+        for (ScToggleButton button : list)
+            if (button.isSelected())
+                selected.add(button);
+
+        // Convert to an array and return it
+        return selected.toArray(new ScToggleButton[selected.size()]);
+    }
+
+    /**
+     * Check if a group has selection
+     */
+    @SuppressWarnings("unused")
+    public static boolean groupHasSelection(String group) {
+        return ScToggleButton.getGroupSelection(group).length > 0;
+    }
+
+    /**
+     * Update the group status selection.
+     */
+    private void manageGroupSelection() {
+        // Manage the group status only if just one can be selected
+        if (!this.mOnlyOneSelected)
             return;
 
-        // Get all buttons in groups
-        List<ScToggleButton> groups = this.filterGroup(this.getGroup());
-        if (groups.size() > 1) {
-            // If status is true reset all other buttons
-            if (this.isSelected())
-                this.resetGroup(groups);
+        // If status is true reset all other buttons
+        if (this.isSelected())
+            ScToggleButton.resetGroup(this.getGroup(), this);
 
-            // Check for constraints
-            if (this.needToForceSelection(groups))
-                groups.get(0).setSelected(true);
+        // Check for constraints
+        if (this.hasGroup() &&
+                !ScToggleButton.groupHasSelection(this.getGroup())) {
+            // Select the first button of group
+            List<ScToggleButton> groups = ScToggleButton.getButtonsGroup(this.getGroup());
+            groups.get(0).setSelected(true);
         }
     }
 
 
     // **************************************************************************************
     // Draw
-
-    /**
-     * Draw the background
-     *
-     * @param canvas where to draw
-     */
-    private void drawBackground(Canvas canvas) {
-        // Check for empty values
-        ColorDrawable background = (ColorDrawable) this.getBackground();
-        if (background != null) {
-            // Set the painter
-            this.mBackgroundPaint.setColor(background.getColor());
-
-            // Draw the background
-            RectF rect = new RectF(0, 0, canvas.getWidth(), canvas.getHeight());
-            canvas.drawRoundRect(
-                    rect,
-                    this.mCornerRadius, this.mCornerRadius,
-                    this.mBackgroundPaint
-            );
-        }
-    }
 
     /**
      * Draw the border
@@ -443,6 +471,8 @@ public class ScToggleButton extends View {
             // Set the painter
             this.mStrokePaint.setColor(this.choiceBorderColor());
             this.mStrokePaint.setStrokeWidth(this.mStrokeSize);
+            this.mStrokePaint.setStyle(
+                    this.isFilled() ? Paint.Style.FILL_AND_STROKE: Paint.Style.STROKE);
 
             // Draw the background
             canvas.drawRoundRect(
@@ -454,21 +484,24 @@ public class ScToggleButton extends View {
     }
 
     /**
-     * Draw the highlight
+     * Draw the led
      *
      * @param canvas where to draw
      */
-    private void drawHighlight(Canvas canvas) {
-        // Setting the painter
-        this.mHighlightPaint.setColor(this.choiceHighlightColor());
-        this.mHighlightPaint.setStrokeWidth(this.mStrokeSize * 2);
-        this.mHighlightPaint.setMaskFilter(this.isSelected() ? this.mHighLightEffect : null);
+    private void drawLed(Canvas canvas) {
+        // Check visibility
+        if (this.mShowLed) {
+            // Setting the painter
+            this.mHighlightPaint.setColor(this.choiceHighlightColor());
+            this.mHighlightPaint.setStrokeWidth(this.mStrokeSize * 2);
+            this.mHighlightPaint.setMaskFilter(this.isSelected() ? this.mHighLightEffect : null);
 
-        // Draw
-        int left = canvas.getWidth() / 4;
-        int right = left * 3;
-        int bottom = canvas.getHeight() - (int) this.mStrokeSize * 4;
-        canvas.drawLine(left, bottom, right, bottom, this.mHighlightPaint);
+            // Draw
+            int left = canvas.getWidth() / 4;
+            int right = left * 3;
+            int bottom = canvas.getHeight() - (int) this.mStrokeSize * 4;
+            canvas.drawLine(left, bottom, right, bottom, this.mHighlightPaint);
+        }
     }
 
     /**
@@ -518,7 +551,7 @@ public class ScToggleButton extends View {
 
             // Create the text layout
             StaticLayout staticLayout = new StaticLayout(
-                    this.mAllCaps ? this.mText.toUpperCase(): this.mText,
+                    this.mAllCaps ? this.mText.toUpperCase() : this.mText,
                     this.mTextPaint,
                     area.width(), align,
                     1, 0, false
@@ -548,7 +581,7 @@ public class ScToggleButton extends View {
     public boolean onTouchEvent(MotionEvent e) {
         // Single click
         if (this.mDetector.onTouchEvent(e))
-            this.fireClick();
+            this.setSelected(!this.isSelected());
 
         return true;
     }
@@ -560,9 +593,9 @@ public class ScToggleButton extends View {
      */
     @Override
     protected void onDraw(Canvas canvas) {
-        this.drawBackground(canvas);
+        // Custom
         this.drawBorder(canvas);
-        this.drawHighlight(canvas);
+        this.drawLed(canvas);
         this.drawText(canvas);
     }
 
@@ -608,7 +641,7 @@ public class ScToggleButton extends View {
         // Add this button at the global list of buttons
         if (!ScToggleButton.mGlobalButtons.contains(this)) {
             ScToggleButton.mGlobalButtons.add(this);
-            this.manageGroup();
+            this.manageGroupSelection();
         }
     }
 
@@ -637,20 +670,22 @@ public class ScToggleButton extends View {
 
         state.putFloat("mStrokeSize", this.mStrokeSize);
         state.putFloat("mCornerRadius", this.mCornerRadius);
+        state.putInt("mCornerRadius", this.mFillMode.ordinal());
 
         state.putString("mText", this.mText);
         state.putInt("mTextAlign", this.mTextAlign.ordinal());
         state.putBoolean("mAllCaps", this.mAllCaps);
+        state.putBoolean("mShowLed", this.mShowLed);
 
         state.putInt("mOffColor", this.mOffColor);
         state.putInt("mOnColor", this.mOnColor);
-        state.putInt("mHighlightColor", this.mHighlightColor);
+        state.putInt("mLedColor", this.mLedColor);
 
         state.putBoolean("mChangeBorderColorOnChecked", this.mChangeBorderColorOnChecked);
         state.putBoolean("mChangeTextColorOnChecked", this.mChangeTextColorOnChecked);
 
         state.putString("mGroup", this.mGroup);
-        state.putBoolean("mAlwaysOneSelectedPerGroup", this.mAlwaysOneSelectedPerGroup);
+        state.putBoolean("mOnlyOneSelected", this.mOnlyOneSelected);
 
         // Return the new state
         return state;
@@ -678,20 +713,22 @@ public class ScToggleButton extends View {
 
         this.mStrokeSize = savedState.getFloat("mStrokeSize");
         this.mCornerRadius = savedState.getFloat("mCornerRadius");
+        this.mFillMode = FillMode.values()[savedState.getInt("mFillMode")];
 
         this.mText = savedState.getString("mText");
         this.mTextAlign = TextAlign.values()[savedState.getInt("mTextAlign")];
         this.mAllCaps = savedState.getBoolean("mAllCaps");
+        this.mShowLed = savedState.getBoolean("mShowLed");
 
         this.mOffColor = savedState.getInt("mOffColor");
         this.mOnColor = savedState.getInt("mOnColor");
-        this.mHighlightColor = savedState.getInt("mHighlightColor");
+        this.mLedColor = savedState.getInt("mLedColor");
 
         this.mChangeBorderColorOnChecked = savedState.getBoolean("mChangeBorderColorOnChecked");
         this.mChangeTextColorOnChecked = savedState.getBoolean("mChangeTextColorOnChecked");
 
         this.mGroup = savedState.getString("mGroup");
-        this.mAlwaysOneSelectedPerGroup = savedState.getBoolean("mAlwaysOneSelectedPerGroup");
+        this.mOnlyOneSelected = savedState.getBoolean("mOnlyOneSelected");
     }
 
 
@@ -719,8 +756,35 @@ public class ScToggleButton extends View {
      * @param listener the listener
      */
     @SuppressWarnings("unused")
-    public void setOnEventListener(OnChangeListener listener) {
+    public void setOnChangeListener(OnChangeListener listener) {
         this.mChangeListener = listener;
+    }
+
+
+    /**
+     * Group change status event listener
+     */
+    @SuppressWarnings("all")
+    public interface OnGroupChangeListener {
+
+        /**
+         * When the selection change
+         *
+         * @param the current button status
+         */
+        void onChanged(ScToggleButton source, ScToggleButton[] selected);
+
+    }
+
+    /**
+     * Set the group change event listener.
+     * NOTE: this is GLOBAL
+     *
+     * @param listener the listener
+     */
+    @SuppressWarnings("unused")
+    public static void setOnGroupChangeListener(OnGroupChangeListener listener) {
+        ScToggleButton.mGroupChangeListener = listener;
     }
 
 
@@ -734,11 +798,30 @@ public class ScToggleButton extends View {
      */
     @Override
     public void setSelected(boolean selected) {
-        // Apply only if changed
-        if (this.isSelected() != selected) {
-            super.setSelected(selected);
-            this.manageGroup();
+        // Apply only if changed.
+        if (this.isSelected() == selected)
+            return;
+
+        // If belongs to a group check for group constraints.
+        if (this.hasGroup()) {
+            ScToggleButton[] list = ScToggleButton.getGroupSelection(this.getGroup());
+            if (this.isSelected() && this.mOnlyOneSelected && list.length < 2)
+                return;
         }
+
+        // Make the selection
+        super.setSelected(selected);
+        this.manageGroupSelection();
+
+        // Group event
+        if (this.hasGroup() && ScToggleButton.mGroupChangeListener != null) {
+            ScToggleButton[] selection = ScToggleButton.getGroupSelection(this.getGroup());
+            ScToggleButton.mGroupChangeListener.onChanged(this, selection);
+        }
+
+        // Button event
+        if (this.mChangeListener != null)
+            this.mChangeListener.onChanged(this.isSelected());
     }
 
 
@@ -783,7 +866,7 @@ public class ScToggleButton extends View {
      */
     @SuppressWarnings("unused")
     public void setFontFamily(String value) {
-        if (!this.equals(this.mFontFamily, value)) {
+        if (!ScToggleButton.equals(this.mFontFamily, value)) {
             this.mFontFamily = value;
             this.invalidate();
         }
@@ -887,6 +970,30 @@ public class ScToggleButton extends View {
 
 
     /**
+     * Get the fill mode
+     *
+     * @return the mode
+     */
+    @SuppressWarnings("unused")
+    public FillMode getFillMode() {
+        return this.mFillMode;
+    }
+
+    /**
+     * Set the fill mode
+     *
+     * @param value the mode
+     */
+    @SuppressWarnings("unused")
+    public void setFillMode(FillMode value) {
+        if (this.mFillMode != value) {
+            this.mFillMode = value;
+            this.invalidate();
+        }
+    }
+
+
+    /**
      * Get the current text
      *
      * @return the text
@@ -903,7 +1010,7 @@ public class ScToggleButton extends View {
      */
     @SuppressWarnings("unused")
     public void setText(String value) {
-        if (!this.equals(this.mText, value)) {
+        if (!ScToggleButton.equals(this.mText, value)) {
             this.mText = value;
             this.invalidate();
         }
@@ -933,6 +1040,7 @@ public class ScToggleButton extends View {
         }
     }
 
+
     /**
      * Get the all caps text status
      *
@@ -955,7 +1063,6 @@ public class ScToggleButton extends View {
             this.invalidate();
         }
     }
-
 
 
     /**
@@ -1013,7 +1120,7 @@ public class ScToggleButton extends View {
      */
     @SuppressWarnings("unused")
     public int getHighlightColor() {
-        return this.mHighlightColor;
+        return this.mLedColor;
     }
 
     /**
@@ -1023,8 +1130,8 @@ public class ScToggleButton extends View {
      */
     @SuppressWarnings("unused")
     public void setHighlightColor(int value) {
-        if (this.mHighlightColor != value) {
-            this.mHighlightColor = value;
+        if (this.mLedColor != value) {
+            this.mLedColor = value;
             this.invalidate();
         }
     }
@@ -1095,34 +1202,34 @@ public class ScToggleButton extends View {
      */
     @SuppressWarnings("unused")
     public void setGroup(String value) {
-        if (!this.equals(this.mGroup, value)) {
+        if (!ScToggleButton.equals(this.mGroup, value)) {
             this.mGroup = value;
-            this.manageGroup();
+            this.manageGroupSelection();
             this.invalidate();
         }
     }
 
 
     /**
-     * Get if at least one button per this groups must be selected
+     * If only one button per group can be selected at the same time
      *
-     * @return true if will checked
+     * @return true only one
      */
     @SuppressWarnings("unused")
-    public boolean getAlwaysOneSelectedPerGroup() {
-        return this.mAlwaysOneSelectedPerGroup;
+    public boolean getOnlyOneSelected() {
+        return this.mOnlyOneSelected;
     }
 
     /**
-     * Set if at least one button per this groups must be selected
+     * If only one button per group can be selected at the same time
      *
-     * @param value if true will checked
+     * @param value if true only one
      */
     @SuppressWarnings("unused")
-    public void setAlwaysOneSelectedPerGroup(boolean value) {
-        if (this.mAlwaysOneSelectedPerGroup != value) {
-            this.mAlwaysOneSelectedPerGroup = value;
-            this.manageGroup();
+    public void setOnlyOneSelected(boolean value) {
+        if (this.mOnlyOneSelected != value) {
+            this.mOnlyOneSelected = value;
+            this.manageGroupSelection();
             this.invalidate();
         }
     }
