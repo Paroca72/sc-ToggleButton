@@ -15,7 +15,7 @@
         app:cornerRadius="24dp"
         app:group="TEST"
         app:showLed="false"
-        app:fillMode="off"
+        app:filling="off"
         app:text="TEST" />
 
     <com.sccomponents.togglebutton.ScToggleButton

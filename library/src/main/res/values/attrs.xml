@@ -21,7 +21,7 @@
         <attr name="changeText" format="boolean" />
         <attr name="group" format="string" />
         <attr name="onlyOneSelected" format="boolean" />
-        <attr name="fillMode" />
+        <attr name="filling" />
     </declare-styleable>
 
     <attr name="align" format="enum">
@@ -30,7 +30,7 @@
         <enum name="right" value="2" />
     </attr>
 
-    <attr name="fillMode" format="enum">
+    <attr name="filling" format="enum">
         <enum name="never" value="0" />
         <enum name="always" value="1" />
         <enum name="on" value="2" />

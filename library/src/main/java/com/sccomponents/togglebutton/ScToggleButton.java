@@ -80,7 +80,7 @@ public class ScToggleButton extends View {
 
     protected float mStrokeSize = ScToggleButton.STROKE_SIZE;
     protected float mCornerRadius = this.dipToPixel(ScToggleButton.CORNER_RADIUS);
-    protected FillMode mFillMode = FillMode.NEVER;
+    protected FillMode mFilling = FillMode.NEVER;
 
     protected String mText = null;
     protected TextAlign mTextAlign = TextAlign.CENTER;
@@ -191,8 +191,8 @@ public class ScToggleButton extends View {
                 R.styleable.ScToggleButton_strokeSize,
                 this.dipToPixel(ScToggleButton.STROKE_SIZE));
         int fillMode = attrArray.getInt(
-                R.styleable.ScToggleButton_fillMode, FillMode.NEVER.ordinal());
-        this.mFillMode = FillMode.values()[fillMode];
+                R.styleable.ScToggleButton_filling, FillMode.NEVER.ordinal());
+        this.mFilling = FillMode.values()[fillMode];
 
         this.mText = attrArray.getString(
                 R.styleable.ScToggleButton_text);
@@ -294,7 +294,7 @@ public class ScToggleButton extends View {
      * Check if the component background if filled
      */
     private boolean isFilled() {
-        switch (this.mFillMode) {
+        switch (this.mFilling) {
             case ALWAYS: return true;
             case NEVER: return false;
             case ON: return this.isSelected();
@@ -671,7 +671,7 @@ public class ScToggleButton extends View {
 
         state.putFloat("mStrokeSize", this.mStrokeSize);
         state.putFloat("mCornerRadius", this.mCornerRadius);
-        state.putInt("mCornerRadius", this.mFillMode.ordinal());
+        state.putInt("mFilling", this.mFilling.ordinal());
 
         state.putString("mText", this.mText);
         state.putInt("mTextAlign", this.mTextAlign.ordinal());
@@ -714,7 +714,7 @@ public class ScToggleButton extends View {
 
         this.mStrokeSize = savedState.getFloat("mStrokeSize");
         this.mCornerRadius = savedState.getFloat("mCornerRadius");
-        this.mFillMode = FillMode.values()[savedState.getInt("mFillMode")];
+        this.mFilling = FillMode.values()[savedState.getInt("mFilling")];
 
         this.mText = savedState.getString("mText");
         this.mTextAlign = TextAlign.values()[savedState.getInt("mTextAlign")];
@@ -976,8 +976,8 @@ public class ScToggleButton extends View {
      * @return the mode
      */
     @SuppressWarnings("unused")
-    public FillMode getFillMode() {
-        return this.mFillMode;
+    public FillMode getFilling() {
+        return this.mFilling;
     }
 
     /**
@@ -986,9 +986,9 @@ public class ScToggleButton extends View {
      * @param value the mode
      */
     @SuppressWarnings("unused")
-    public void setFillMode(FillMode value) {
-        if (this.mFillMode != value) {
-            this.mFillMode = value;
+    public void setFilling(FillMode value) {
+        if (this.mFilling != value) {
+            this.mFilling = value;
             this.invalidate();
         }
     }
