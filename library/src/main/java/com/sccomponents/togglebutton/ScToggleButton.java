@@ -444,7 +444,8 @@ public class ScToggleButton extends View {
                 !ScToggleButton.groupHasSelection(this.getGroup())) {
             // Select the first button of group
             List<ScToggleButton> groups = ScToggleButton.getButtonsGroup(this.getGroup());
-            groups.get(0).setSelected(true);
+            if (groups.size() > 0)
+                groups.get(0).setSelected(true);
         }
     }
 
