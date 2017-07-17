@@ -9,20 +9,11 @@
     tools:context="com.sccomponents.togglebutton.demo.MainActivity">
 
     <com.sccomponents.togglebutton.ScToggleButton
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:padding="10dp"
-        app:cornerRadius="24dp"
-        app:group="TEST"
-        app:showLed="false"
-        app:filling="off"
-        app:text="TEST" />
-
-    <com.sccomponents.togglebutton.ScToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="10dp"
         app:changeBorder="false"
+        app:onlyOneSelected="false"
         app:group="TEST"
         app:ledColor="@color/colorAccent"
         app:text="TEST" />
@@ -32,6 +23,17 @@
         android:layout_height="wrap_content"
         android:padding="10dp"
         app:changeBorder="false"
+        app:onlyOneSelected="false"
+        app:group="TEST"
+        app:ledColor="@color/colorAccent"
+        app:text="TEST" />
+
+    <com.sccomponents.togglebutton.ScToggleButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        app:changeBorder="false"
+        app:onlyOneSelected="false"
         app:group="TEST"
         app:ledColor="@color/colorAccent"
         app:text="TEST" />

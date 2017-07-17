@@ -42,7 +42,7 @@ public class ScToggleButton extends View {
     private static final int STROKE_SIZE = 2;
 
     private static List<ScToggleButton> mGlobalButtons = null;
-    private static OnGroupChangeListener mGroupChangeListener = null;
+    private static List<OnGroupChangeListener> mGroupChangeListener = null;
 
 
     // ***************************************************************************************
@@ -295,10 +295,14 @@ public class ScToggleButton extends View {
      */
     private boolean isFilled() {
         switch (this.mFilling) {
-            case ALWAYS: return true;
-            case NEVER: return false;
-            case ON: return this.isSelected();
-            case OFF: return !this.isSelected();
+            case ALWAYS:
+                return true;
+            case NEVER:
+                return false;
+            case ON:
+                return this.isSelected();
+            case OFF:
+                return !this.isSelected();
         }
         return false;
     }
@@ -321,7 +325,7 @@ public class ScToggleButton extends View {
     private int inverseColor(int color) {
         int backgroundColor = this.choiceBorderColor();
         if (this.isFilled() && color == backgroundColor)
-            return color == this.mOnColor ? this.mOffColor: this.mOnColor;
+            return color == this.mOnColor ? this.mOffColor : this.mOnColor;
         else
             return color;
     }
@@ -333,7 +337,7 @@ public class ScToggleButton extends View {
      */
     private int choiceTextColor() {
         int color = this.mChangeTextColorOnChecked && this.isSelected() ?
-                this.mOnColor: this.mOffColor;
+                this.mOnColor : this.mOffColor;
         return this.inverseColor(color);
     }
 
@@ -344,7 +348,7 @@ public class ScToggleButton extends View {
      */
     private int choiceHighlightColor() {
         int color = this.mLedColor == -1 ? this.mOnColor : this.mLedColor;
-        color = this.isSelected() ? color: this.mOffColor;
+        color = this.isSelected() ? color : this.mOffColor;
         return this.inverseColor(color);
     }
 
@@ -473,7 +477,7 @@ public class ScToggleButton extends View {
             this.mStrokePaint.setColor(this.choiceBorderColor());
             this.mStrokePaint.setStrokeWidth(this.mStrokeSize);
             this.mStrokePaint.setStyle(
-                    this.isFilled() ? Paint.Style.FILL_AND_STROKE: Paint.Style.STROKE);
+                    this.isFilled() ? Paint.Style.FILL_AND_STROKE : Paint.Style.STROKE);
 
             // Draw the background
             canvas.drawRoundRect(
@@ -778,14 +782,51 @@ public class ScToggleButton extends View {
     }
 
     /**
-     * Set the group change event listener.
-     * NOTE: this is GLOBAL
+     * Add it to the global listener.
      *
      * @param listener the listener
      */
     @SuppressWarnings("unused")
-    public static void setOnGroupChangeListener(OnGroupChangeListener listener) {
-        ScToggleButton.mGroupChangeListener = listener;
+    public static void addOnGroupChangeListener(OnGroupChangeListener listener) {
+        // Check for empty values
+        if (ScToggleButton.mGroupChangeListener == null)
+            ScToggleButton.mGroupChangeListener = new ArrayList<>();
+
+        // Add the listener
+        ScToggleButton.mGroupChangeListener.add(listener);
+    }
+
+    /**
+     * Remove it to the global listener.
+     *
+     * @param listener the listener
+     */
+    @SuppressWarnings("unused")
+    public static void removeOnGroupChangeListener(OnGroupChangeListener listener) {
+        // Check for empty values
+        if (ScToggleButton.mGroupChangeListener != null)
+            // Add the listener
+            ScToggleButton.mGroupChangeListener.remove(listener);
+    }
+
+    /**
+     * Perform an global listener action
+     */
+    @SuppressWarnings("unused")
+    private void performGroupOnChange(ScToggleButton source) {
+        // Cycle all listeners
+        if (ScToggleButton.mGroupChangeListener != null)
+            for (OnGroupChangeListener listener : ScToggleButton.mGroupChangeListener)
+                try {
+                    // Check for null value and try to execute the event
+                    if (listener != null) {
+                        ScToggleButton[] selected = ScToggleButton.getGroupSelection(source.getGroup());
+                        listener.onChanged(source, selected);
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
     }
 
 
@@ -815,10 +856,8 @@ public class ScToggleButton extends View {
         this.manageGroupSelection();
 
         // Group event
-        if (this.hasGroup() && ScToggleButton.mGroupChangeListener != null) {
-            ScToggleButton[] selection = ScToggleButton.getGroupSelection(this.getGroup());
-            ScToggleButton.mGroupChangeListener.onChanged(this, selection);
-        }
+        if (this.hasGroup())
+            this.performGroupOnChange(this);
 
         // Button event
         if (this.mChangeListener != null)
