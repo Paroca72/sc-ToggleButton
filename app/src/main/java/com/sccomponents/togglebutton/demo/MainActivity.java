@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
 
         ScToggleButton.addOnGroupChangeListener(new ScToggleButton.OnGroupChangeListener() {
             @Override
-            public void onChanged(ScToggleButton source, ScToggleButton[] selected) {
+            public void onChanged(ScToggleButton source) {
                 String i = "";
             }
         });

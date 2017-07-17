@@ -777,7 +777,7 @@ public class ScToggleButton extends View {
          *
          * @param the current button status
          */
-        void onChanged(ScToggleButton source, ScToggleButton[] selected);
+        void onChanged(ScToggleButton source);
 
     }
 
@@ -819,10 +819,8 @@ public class ScToggleButton extends View {
             for (OnGroupChangeListener listener : ScToggleButton.mGroupChangeListener)
                 try {
                     // Check for null value and try to execute the event
-                    if (listener != null) {
-                        ScToggleButton[] selected = ScToggleButton.getGroupSelection(source.getGroup());
-                        listener.onChanged(source, selected);
-                    }
+                    if (listener != null)
+                        listener.onChanged(source);
 
                 } catch (Exception e) {
                     e.printStackTrace();
