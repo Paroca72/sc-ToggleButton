@@ -92,10 +92,10 @@ public class ScToggleButton extends View {
 
     protected int mOffColor = Color.parseColor("#3F51B5");
     protected int mOnColor = Color.parseColor("#45AA46");
-    protected int mLedOnColor = -1;
-    protected int mLedOffColor = -1;
-    protected int mTextOnColor = -1;
-    protected int mTextOffColor = -1;
+    protected int mLedOnColor = Integer.MAX_VALUE;
+    protected int mLedOffColor = Integer.MAX_VALUE;
+    protected int mTextOnColor = Integer.MAX_VALUE;
+    protected int mTextOffColor = Integer.MAX_VALUE;
 
     protected String mGroup = null;
     protected boolean mOnlyOneSelected = true;
@@ -203,9 +203,9 @@ public class ScToggleButton extends View {
                 R.styleable.ScButtons_textOff);
 
         this.mTextOnColor = attrArray.getColor(
-                R.styleable.ScButtons_textOnColor, -1);
+                R.styleable.ScButtons_textOnColor, Integer.MAX_VALUE);
         this.mTextOffColor = attrArray.getColor(
-                R.styleable.ScButtons_textOffColor, -1);
+                R.styleable.ScButtons_textOffColor, Integer.MAX_VALUE);
 
         int textAlign = attrArray.getInt(
                 R.styleable.ScButtons_align, TextAlign.CENTER.ordinal());
@@ -217,9 +217,9 @@ public class ScToggleButton extends View {
                 R.styleable.ScButtons_onColor, Color.parseColor("#45AA46"));
 
         this.mLedOnColor = attrArray.getColor(
-                R.styleable.ScButtons_ledOnColor, -1);
+                R.styleable.ScButtons_ledOnColor, Integer.MAX_VALUE);
         this.mLedOffColor = attrArray.getColor(
-                R.styleable.ScButtons_ledOffColor, -1);
+                R.styleable.ScButtons_ledOffColor, Integer.MAX_VALUE);
 
         this.mShowLed = attrArray.getBoolean(
                 R.styleable.ScButtons_showLed, true);
@@ -324,7 +324,7 @@ public class ScToggleButton extends View {
      */
     private int choiceBorderColor() {
         // Get the border color
-        return this.isSelected() || this.mOffColor == -1 ? this.mOnColor : this.mOffColor;
+        return this.isSelected() || this.mOffColor == Integer.MAX_VALUE ? this.mOnColor : this.mOffColor;
     }
 
     /**
@@ -335,18 +335,18 @@ public class ScToggleButton extends View {
         int color = this.isSelected() ? onColor: offColor;
 
         if (this.isSelected()) {
-            if (color == -1)
+            if (color == Integer.MAX_VALUE)
                 color = this.mOnColor;
         } else {
-            if (color == -1 && onColor != -1)
+            if (color == Integer.MAX_VALUE && onColor != Integer.MAX_VALUE)
                 color = onColor;
-            if (color == -1 && this.mOffColor != -1)
+            if (color == Integer.MAX_VALUE && this.mOffColor != Integer.MAX_VALUE)
                 color = this.mOffColor;
-            if (color == -1)
+            if (color == Integer.MAX_VALUE)
                 color = this.mOnColor;
         }
 
-        if (onColor == -1 && offColor == -1 && this.isFilled())
+        if (onColor == Integer.MAX_VALUE && offColor == Integer.MAX_VALUE && this.isFilled())
             color = this.choiceBorderColor() == this.mOnColor ? this.mOffColor: this.mOnColor;
 
         // return
