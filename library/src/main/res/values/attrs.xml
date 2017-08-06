@@ -2,7 +2,7 @@
 <resources>
 
     <!-- Components -->
-    <declare-styleable name="ScToggleButton">
+    <declare-styleable name="ScButtons">
         <attr name="selected" format="boolean" />
         <attr name="fontFamily" format="string" />
         <attr name="fontSize" format="dimension" />
@@ -10,15 +10,19 @@
         <attr name="italic" format="boolean" />
         <attr name="allCaps" format="boolean" />
         <attr name="showLed" format="boolean" />
+        <attr name="ledOnColor" format="color" />
+        <attr name="ledOffColor" format="color" />
         <attr name="strokeSize" format="dimension" />
         <attr name="text" format="string" />
+        <attr name="textOn" format="string" />
+        <attr name="textOff" format="string" />
+        <attr name="textOnColor" format="color" />
+        <attr name="textOffColor" format="color" />
         <attr name="align" />
         <attr name="cornerRadius" format="dimension" />
         <attr name="onColor" format="color" />
         <attr name="offColor" format="color" />
-        <attr name="ledColor" format="color" />
-        <attr name="changeBorder" format="boolean" />
-        <attr name="changeText" format="boolean" />
+        <attr name="backgroundColor" format="color" />
         <attr name="group" format="string" />
         <attr name="onlyOneSelected" format="boolean" />
         <attr name="filling" />

@@ -1,4 +1,4 @@
-package com.sccomponents.togglebutton;
+package com.sccomponents.buttons;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -83,16 +83,19 @@ public class ScToggleButton extends View {
     protected FillMode mFilling = FillMode.NEVER;
 
     protected String mText = null;
+    protected String mTextOn = null;
+    protected String mTextOff = null;
+
     protected TextAlign mTextAlign = TextAlign.CENTER;
     protected boolean mAllCaps = true;
     protected boolean mShowLed = true;
 
     protected int mOffColor = Color.parseColor("#3F51B5");
     protected int mOnColor = Color.parseColor("#45AA46");
-    protected int mLedColor = -1;
-
-    protected boolean mChangeBorderColorOnChecked = true;
-    protected boolean mChangeTextColorOnChecked = true;
+    protected int mLedOnColor = -1;
+    protected int mLedOffColor = -1;
+    protected int mTextOnColor = -1;
+    protected int mTextOffColor = -1;
 
     protected String mGroup = null;
     protected boolean mOnlyOneSelected = true;
@@ -164,58 +167,67 @@ public class ScToggleButton extends View {
 
         // Get the attributes list
         final TypedArray attrArray = context
-                .obtainStyledAttributes(attrs, R.styleable.ScToggleButton, defStyle, 0);
+                .obtainStyledAttributes(attrs, R.styleable.ScButtons, defStyle, 0);
 
         boolean isSelected = attrArray.getBoolean(
-                R.styleable.ScToggleButton_selected, false);
+                R.styleable.ScButtons_selected, false);
 
         this.mFontSize = attrArray.getDimension(
-                R.styleable.ScToggleButton_fontSize,
+                R.styleable.ScButtons_fontSize,
                 this.dipToPixel(ScToggleButton.FONT_SIZE));
         this.mFontFamily = attrArray.getString(
-                R.styleable.ScToggleButton_fontFamily);
+                R.styleable.ScButtons_fontFamily);
         this.mFontIsBold = attrArray.getBoolean(
 
-                R.styleable.ScToggleButton_bold, true);
+                R.styleable.ScButtons_bold, true);
         this.mFontIsItalic = attrArray.getBoolean(
-                R.styleable.ScToggleButton_italic, false);
+                R.styleable.ScButtons_italic, false);
         this.mAllCaps = attrArray.getBoolean(
-                R.styleable.ScToggleButton_allCaps, true);
-        this.mShowLed = attrArray.getBoolean(
-                R.styleable.ScToggleButton_showLed, true);
+                R.styleable.ScButtons_allCaps, true);
 
         this.mCornerRadius = attrArray.getDimension(
-                R.styleable.ScToggleButton_cornerRadius,
+                R.styleable.ScButtons_cornerRadius,
                 this.dipToPixel(ScToggleButton.CORNER_RADIUS));
         this.mStrokeSize = attrArray.getDimension(
-                R.styleable.ScToggleButton_strokeSize,
+                R.styleable.ScButtons_strokeSize,
                 this.dipToPixel(ScToggleButton.STROKE_SIZE));
         int fillMode = attrArray.getInt(
-                R.styleable.ScToggleButton_filling, FillMode.NEVER.ordinal());
+                R.styleable.ScButtons_filling, FillMode.NEVER.ordinal());
         this.mFilling = FillMode.values()[fillMode];
 
         this.mText = attrArray.getString(
-                R.styleable.ScToggleButton_text);
+                R.styleable.ScButtons_text);
+        this.mTextOn = attrArray.getString(
+                R.styleable.ScButtons_textOn);
+        this.mTextOff = attrArray.getString(
+                R.styleable.ScButtons_textOff);
+
+        this.mTextOnColor = attrArray.getColor(
+                R.styleable.ScButtons_textOnColor, -1);
+        this.mTextOffColor = attrArray.getColor(
+                R.styleable.ScButtons_textOffColor, -1);
+
         int textAlign = attrArray.getInt(
-                R.styleable.ScToggleButton_align, TextAlign.CENTER.ordinal());
+                R.styleable.ScButtons_align, TextAlign.CENTER.ordinal());
         this.mTextAlign = TextAlign.values()[textAlign];
 
         this.mOffColor = attrArray.getColor(
-                R.styleable.ScToggleButton_offColor, Color.parseColor("#3F51B5"));
+                R.styleable.ScButtons_offColor, Color.parseColor("#3F51B5"));
         this.mOnColor = attrArray.getColor(
-                R.styleable.ScToggleButton_onColor, Color.parseColor("#45AA46"));
-        this.mLedColor = attrArray.getColor(
-                R.styleable.ScToggleButton_ledColor, -1);
+                R.styleable.ScButtons_onColor, Color.parseColor("#45AA46"));
 
-        this.mChangeBorderColorOnChecked = attrArray.getBoolean(
-                R.styleable.ScToggleButton_changeBorder, true);
-        this.mChangeTextColorOnChecked = attrArray.getBoolean(
-                R.styleable.ScToggleButton_changeText, true);
+        this.mLedOnColor = attrArray.getColor(
+                R.styleable.ScButtons_ledOnColor, -1);
+        this.mLedOffColor = attrArray.getColor(
+                R.styleable.ScButtons_ledOffColor, -1);
+
+        this.mShowLed = attrArray.getBoolean(
+                R.styleable.ScButtons_showLed, true);
 
         this.mGroup = attrArray.getString(
-                R.styleable.ScToggleButton_group);
+                R.styleable.ScButtons_group);
         this.mOnlyOneSelected = attrArray.getBoolean(
-                R.styleable.ScToggleButton_onlyOneSelected, true);
+                R.styleable.ScButtons_onlyOneSelected, true);
 
         // Recycle
         attrArray.recycle();
@@ -255,7 +267,7 @@ public class ScToggleButton extends View {
      * @param context the current context
      * @return the display metrics
      */
-    private DisplayMetrics getDisplayMetrics(Context context) {
+    protected DisplayMetrics getDisplayMetrics(Context context) {
         // Get the window manager from the window service
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         // Create the variable holder and inject the values
@@ -272,7 +284,7 @@ public class ScToggleButton extends View {
      * @return the correspondent value in Pixels
      */
     //
-    private float dipToPixel(float dip) {
+    protected float dipToPixel(float dip) {
         // Get the display metrics
         DisplayMetrics metrics = this.getDisplayMetrics(this.getContext());
         // Calc the conversion by the screen density
@@ -309,47 +321,52 @@ public class ScToggleButton extends View {
 
     /**
      * Get back the border color by the current state
-     *
-     * @return the color
      */
     private int choiceBorderColor() {
-        if (this.mChangeBorderColorOnChecked && this.isSelected())
-            return this.mOnColor;
-        else
-            return this.mOffColor;
+        // Get the border color
+        return this.isSelected() || this.mOffColor == -1 ? this.mOnColor : this.mOffColor;
     }
 
     /**
-     * If the same color of background choice the other color
+     * Get back a color by the current state
      */
-    private int inverseColor(int color) {
-        int backgroundColor = this.choiceBorderColor();
-        if (this.isFilled() && color == backgroundColor)
-            return color == this.mOnColor ? this.mOffColor : this.mOnColor;
-        else
-            return color;
+    private int choiceColor(int onColor, int offColor) {
+        // Get the text color
+        int color = this.isSelected() ? onColor: offColor;
+
+        if (this.isSelected()) {
+            if (color == -1)
+                color = this.mOnColor;
+        } else {
+            if (color == -1 && onColor != -1)
+                color = onColor;
+            if (color == -1 && this.mOffColor != -1)
+                color = this.mOffColor;
+            if (color == -1)
+                color = this.mOnColor;
+        }
+
+        if (onColor == -1 && offColor == -1 && this.isFilled())
+            color = this.choiceBorderColor() == this.mOnColor ? this.mOffColor: this.mOnColor;
+
+        // return
+        return color;
     }
 
     /**
      * Get back the text color by the current state
-     *
-     * @return the color
      */
     private int choiceTextColor() {
-        int color = this.mChangeTextColorOnChecked && this.isSelected() ?
-                this.mOnColor : this.mOffColor;
-        return this.inverseColor(color);
+        // Get the text color
+        return this.choiceColor(this.mTextOnColor, this.mTextOffColor);
     }
 
     /**
-     * Get back the highlight color by the current state
-     *
-     * @return the color
+     * Get back the led color by the current state
      */
-    private int choiceHighlightColor() {
-        int color = this.mLedColor == -1 ? this.mOnColor : this.mLedColor;
-        color = this.isSelected() ? color : this.mOffColor;
-        return this.inverseColor(color);
+    private int choiceLedColor() {
+        // Get the text color
+        return this.choiceColor(this.mLedOnColor, this.mLedOnColor);
     }
 
 
@@ -497,7 +514,7 @@ public class ScToggleButton extends View {
         // Check visibility
         if (this.mShowLed) {
             // Setting the painter
-            this.mHighlightPaint.setColor(this.choiceHighlightColor());
+            this.mHighlightPaint.setColor(this.choiceLedColor());
             this.mHighlightPaint.setStrokeWidth(this.mStrokeSize * 2);
             this.mHighlightPaint.setMaskFilter(this.isSelected() ? this.mHighLightEffect : null);
 
@@ -515,8 +532,13 @@ public class ScToggleButton extends View {
      * @param canvas where to draw
      */
     private void drawText(Canvas canvas) {
+        // Choice the text
+        String text = this.mText;
+        if (this.isSelected() && this.mTextOn != null) text = this.mTextOn;
+        if (!this.isSelected() && this.mTextOff != null) text = this.mTextOff;
+
         // Check for empty values
-        if (this.mText != null && this.mText.length() > 0) {
+        if (text != null && text.length() > 0) {
             // Get the drawing area
             Rect area = new Rect(
                     0 + this.getPaddingLeft(),
@@ -556,7 +578,7 @@ public class ScToggleButton extends View {
 
             // Create the text layout
             StaticLayout staticLayout = new StaticLayout(
-                    this.mAllCaps ? this.mText.toUpperCase() : this.mText,
+                    this.mAllCaps ? text.toUpperCase() : text,
                     this.mTextPaint,
                     area.width(), align,
                     1, 0, false
@@ -678,16 +700,18 @@ public class ScToggleButton extends View {
         state.putInt("mFilling", this.mFilling.ordinal());
 
         state.putString("mText", this.mText);
+        state.putString("mTextOn", this.mTextOn);
+        state.putString("mTextOff", this.mTextOff);
         state.putInt("mTextAlign", this.mTextAlign.ordinal());
         state.putBoolean("mAllCaps", this.mAllCaps);
         state.putBoolean("mShowLed", this.mShowLed);
 
         state.putInt("mOffColor", this.mOffColor);
         state.putInt("mOnColor", this.mOnColor);
-        state.putInt("mLedColor", this.mLedColor);
-
-        state.putBoolean("mChangeBorderColorOnChecked", this.mChangeBorderColorOnChecked);
-        state.putBoolean("mChangeTextColorOnChecked", this.mChangeTextColorOnChecked);
+        state.putInt("mLedOnColor", this.mLedOnColor);
+        state.putInt("mLedOffColor", this.mLedOffColor);
+        state.putInt("mTextOnColor", this.mTextOnColor);
+        state.putInt("mTextOffColor", this.mTextOffColor);
 
         state.putString("mGroup", this.mGroup);
         state.putBoolean("mOnlyOneSelected", this.mOnlyOneSelected);
@@ -721,16 +745,19 @@ public class ScToggleButton extends View {
         this.mFilling = FillMode.values()[savedState.getInt("mFilling")];
 
         this.mText = savedState.getString("mText");
+        this.mTextOn = savedState.getString("mTextOn");
+        this.mTextOff = savedState.getString("mTextOff");
+
         this.mTextAlign = TextAlign.values()[savedState.getInt("mTextAlign")];
         this.mAllCaps = savedState.getBoolean("mAllCaps");
         this.mShowLed = savedState.getBoolean("mShowLed");
 
         this.mOffColor = savedState.getInt("mOffColor");
         this.mOnColor = savedState.getInt("mOnColor");
-        this.mLedColor = savedState.getInt("mLedColor");
-
-        this.mChangeBorderColorOnChecked = savedState.getBoolean("mChangeBorderColorOnChecked");
-        this.mChangeTextColorOnChecked = savedState.getBoolean("mChangeTextColorOnChecked");
+        this.mLedOnColor = savedState.getInt("mLedOnColor");
+        this.mLedOffColor = savedState.getInt("mLedOffColor");
+        this.mTextOnColor = savedState.getInt("mTextOnColor");
+        this.mTextOffColor = savedState.getInt("mTextOffColor");
 
         this.mGroup = savedState.getString("mGroup");
         this.mOnlyOneSelected = savedState.getBoolean("mOnlyOneSelected");
@@ -1056,6 +1083,54 @@ public class ScToggleButton extends View {
 
 
     /**
+     * Get the current text when the state is ON
+     *
+     * @return the text
+     */
+    @SuppressWarnings("unused")
+    public String getTextOn() {
+        return this.mTextOn;
+    }
+
+    /**
+     * Set the current text when the state is OFF
+     *
+     * @param value the text
+     */
+    @SuppressWarnings("unused")
+    public void setTextOn(String value) {
+        if (!ScToggleButton.equals(this.mTextOn, value)) {
+            this.mTextOn = value;
+            this.invalidate();
+        }
+    }
+
+
+    /**
+     * Get the current text when the state is OFF
+     *
+     * @return the text
+     */
+    @SuppressWarnings("unused")
+    public String getTextOff() {
+        return this.mTextOff;
+    }
+
+    /**
+     * Set the current text when the state is ON
+     *
+     * @param value the text
+     */
+    @SuppressWarnings("unused")
+    public void setTextOff(String value) {
+        if (!ScToggleButton.equals(this.mTextOff, value)) {
+            this.mTextOff = value;
+            this.invalidate();
+        }
+    }
+
+
+    /**
      * Get the text alignment
      *
      * @return the alignment
@@ -1152,72 +1227,96 @@ public class ScToggleButton extends View {
 
 
     /**
-     * Get the highlight color
+     * Get the led on color
      *
      * @return the color
      */
     @SuppressWarnings("unused")
-    public int getHighlightColor() {
-        return this.mLedColor;
+    public int getLedOnColor() {
+        return this.mLedOnColor;
     }
 
     /**
-     * Set the highlight color
+     * Set the led on color
      *
      * @param value the color
      */
     @SuppressWarnings("unused")
-    public void setHighlightColor(int value) {
-        if (this.mLedColor != value) {
-            this.mLedColor = value;
+    public void setLedOnColor(int value) {
+        if (this.mLedOnColor != value) {
+            this.mLedOnColor = value;
             this.invalidate();
         }
     }
 
 
     /**
-     * Get if the border color will changed on the button selection
+     * Get the led off color
      *
-     * @return true if will changed
+     * @return the color
      */
     @SuppressWarnings("unused")
-    public boolean getChangeBorderColorOnChecked() {
-        return this.mChangeBorderColorOnChecked;
+    public int getLedOffColor() {
+        return this.mLedOffColor;
     }
 
     /**
-     * Set if the border color will changed on the button selection
+     * Set the led off color
      *
-     * @param value if true will changed
+     * @param value the color
      */
     @SuppressWarnings("unused")
-    public void setChangeBorderColorOnChecked(boolean value) {
-        if (this.mChangeBorderColorOnChecked != value) {
-            this.mChangeBorderColorOnChecked = value;
+    public void setLedOffColor(int value) {
+        if (this.mLedOffColor != value) {
+            this.mLedOffColor = value;
             this.invalidate();
         }
     }
 
 
     /**
-     * Get if the text color will changed on the button selection
+     * Get the text on color
      *
-     * @return true if will changed
+     * @return the color
      */
     @SuppressWarnings("unused")
-    public boolean getChangeTextColorOnChecked() {
-        return this.mChangeTextColorOnChecked;
+    public int getTextOnColor() {
+        return this.mTextOnColor;
     }
 
     /**
-     * Set if the text color will changed on the button selection
+     * Set the text on color
      *
-     * @param value if true will changed
+     * @param value the color
      */
     @SuppressWarnings("unused")
-    public void setChangeTextColorOnChecked(boolean value) {
-        if (this.mChangeTextColorOnChecked != value) {
-            this.mChangeTextColorOnChecked = value;
+    public void setTextOnColor(int value) {
+        if (this.mTextOnColor != value) {
+            this.mTextOnColor = value;
+            this.invalidate();
+        }
+    }
+
+
+    /**
+     * Get the text off color
+     *
+     * @return the color
+     */
+    @SuppressWarnings("unused")
+    public int getTextOffColor() {
+        return this.mTextOffColor;
+    }
+
+    /**
+     * Set the text off color
+     *
+     * @param value the color
+     */
+    @SuppressWarnings("unused")
+    public void setTextOffColor(int value) {
+        if (this.mTextOffColor != value) {
+            this.mTextOffColor = value;
             this.invalidate();
         }
     }
@@ -1271,5 +1370,30 @@ public class ScToggleButton extends View {
             this.invalidate();
         }
     }
+
+
+    /**
+     * Get the led visibility status
+     *
+     * @return true if showed
+     */
+    @SuppressWarnings("unused")
+    public boolean getShowLed() {
+        return this.mShowLed;
+    }
+
+    /**
+     * Set the led visibility status
+     *
+     * @param value if true is showed
+     */
+    @SuppressWarnings("unused")
+    public void setShowLed(boolean value) {
+        if (this.mShowLed != value) {
+            this.mShowLed = value;
+            this.invalidate();
+        }
+    }
+
 
 }

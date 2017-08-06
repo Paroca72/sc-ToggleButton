@@ -6,36 +6,18 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context="com.sccomponents.togglebutton.demo.MainActivity">
+    tools:context="com.sccomponents.buttons.demo.MainActivity">
 
-    <com.sccomponents.togglebutton.ScToggleButton
+    <com.sccomponents.buttons.ScSwitch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:changeBorder="false"
-        app:onlyOneSelected="false"
-        app:group="TEST"
-        app:ledColor="@color/colorAccent"
-        app:text="TEST" />
+        app:textOff="OFF"
+        app:textOn="ON" />
 
-    <com.sccomponents.togglebutton.ScToggleButton
+    <com.sccomponents.buttons.ScToggleButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:changeBorder="false"
-        app:onlyOneSelected="false"
-        app:group="TEST"
-        app:ledColor="@color/colorAccent"
-        app:text="TEST" />
-
-    <com.sccomponents.togglebutton.ScToggleButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:changeBorder="false"
-        app:onlyOneSelected="false"
-        app:group="TEST"
-        app:ledColor="@color/colorAccent"
-        app:text="TEST" />
+        app:textOff="OFF"
+        app:textOn="ON" />
 
 </LinearLayout>
