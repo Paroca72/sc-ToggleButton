@@ -366,7 +366,7 @@ public class ScToggleButton extends View {
      */
     private int choiceLedColor() {
         // Get the text color
-        return this.choiceColor(this.mLedOnColor, this.mLedOnColor);
+        return this.choiceColor(this.mLedOnColor, this.mLedOffColor);
     }
 
 
