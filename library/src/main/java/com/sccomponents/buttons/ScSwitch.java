@@ -40,7 +40,7 @@ public class ScSwitch extends ScToggleButton {
     // ***************************************************************************************
     // Privates variable
 
-    private int mCurrentLeftPosition = 0;
+    private int mCurrentLeftPosition = Integer.MIN_VALUE;
 
     private Paint mBackgroundPaint = null;
     private Bitmap mHalfBitmap = null;
@@ -157,6 +157,10 @@ public class ScSwitch extends ScToggleButton {
      */
     @Override
     protected void onDraw(Canvas canvas) {
+        // Check for the position
+        if (this.mCurrentLeftPosition == Integer.MIN_VALUE)
+            this.mCurrentLeftPosition = this.isSelected() ? this.getWidth() / 2 : 0;
+
         // Draw the background and the half canvas in the right position
         this.drawSolidBackground(canvas);
 
@@ -208,10 +212,11 @@ public class ScSwitch extends ScToggleButton {
         super.setSelected(selected);
 
         // Check for animate
-        if (this.mAnimate) {
+        int width = this.getWidth();
+        if (this.mAnimate && width != 0) {
             // Set the range
             int start = this.mCurrentLeftPosition;
-            int end = this.isSelected() ? this.getWidth() / 2 : 0;
+            int end = this.isSelected() ? width / 2 : 0;
 
             // Animator
             ValueAnimator animator = ValueAnimator.ofInt(start, end);
@@ -228,8 +233,8 @@ public class ScSwitch extends ScToggleButton {
             animator.start();
 
         } else
-            // Else calculate the final the position
-            this.mCurrentLeftPosition = this.isSelected() ? 0 : this.getWidth() / 2;
+            // Else force the draw method to calculate the final the position
+            this.mCurrentLeftPosition = Integer.MIN_VALUE;
     }
 
 
@@ -306,6 +311,7 @@ public class ScSwitch extends ScToggleButton {
 
     /**
      * Animate the selector movement
+     *
      * @return true animated
      */
     @SuppressWarnings("unused")

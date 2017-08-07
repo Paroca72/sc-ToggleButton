@@ -8,13 +8,15 @@
     android:orientation="vertical"
     tools:context="com.sccomponents.buttons.demo.MainActivity">
 
-    <com.sccomponents.buttons.ScToggleButton
+    <com.sccomponents.buttons.ScSwitch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:filling="on"
         app:onColor="#cccccc"
         app:textOnColor="#ffffff"
-        app:textOffColor="#cccccc"
+        app:textOffColor="#98000000"
+        app:ledOnColor="#98000000"
+        app:selected="true"
         app:textOff="OFF"
         app:textOn="ON" />
 
