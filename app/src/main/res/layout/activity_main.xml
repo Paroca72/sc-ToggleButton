@@ -9,15 +9,16 @@
     tools:context="com.sccomponents.buttons.demo.MainActivity">
 
     <com.sccomponents.buttons.ScSwitch
+        android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:filling="on"
-        app:onColor="#cccccc"
-        app:textOnColor="#ffffff"
-        app:textOffColor="#98000000"
         app:ledOnColor="#98000000"
+        app:onColor="#cccccc"
         app:selected="true"
         app:textOff="OFF"
-        app:textOn="ON" />
+        app:textOffColor="#98000000"
+        app:textOn="ON"
+        app:textOnColor="#ffffff" />
 
 </LinearLayout>

@@ -607,7 +607,7 @@ public class ScToggleButton extends View {
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         // Single click
-        if (this.mDetector.onTouchEvent(e))
+        if (this.isEnabled() && this.mDetector.onTouchEvent(e))
             this.setSelected(!this.isSelected());
 
         return true;
