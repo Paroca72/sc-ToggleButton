@@ -715,6 +715,7 @@ public class ScToggleButton extends View {
 
         state.putString("mGroup", this.mGroup);
         state.putBoolean("mOnlyOneSelected", this.mOnlyOneSelected);
+        state.putBoolean("isSelected", this.isSelected());
 
         // Return the new state
         return state;
@@ -761,6 +762,7 @@ public class ScToggleButton extends View {
 
         this.mGroup = savedState.getString("mGroup");
         this.mOnlyOneSelected = savedState.getBoolean("mOnlyOneSelected");
+        this.setSelected(savedState.getBoolean("isSelected"));
     }
 
 
