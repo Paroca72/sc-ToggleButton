@@ -659,7 +659,6 @@ public class ScToggleButton extends View {
 
         // Remove this toggle buttons from the global buttons list
         ScToggleButton.mGlobalButtons.remove(this);
-        this.setSelected(false);
     }
 
     @Override
