@@ -99,6 +99,7 @@ public class ScToggleButton extends View {
 
     protected String mGroup = null;
     protected boolean mOnlyOneSelected = true;
+    protected boolean mSelected = false;
 
 
     // ***************************************************************************************
@@ -169,7 +170,7 @@ public class ScToggleButton extends View {
         final TypedArray attrArray = context
                 .obtainStyledAttributes(attrs, R.styleable.ScButtons, defStyle, 0);
 
-        boolean isSelected = attrArray.getBoolean(
+        this.mSelected = attrArray.getBoolean(
                 R.styleable.ScButtons_selected, false);
 
         this.mFontSize = attrArray.getDimension(
@@ -257,7 +258,7 @@ public class ScToggleButton extends View {
 
         this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         this.setClickable(true);
-        this.setSelected(isSelected);
+        this.setSelected(this.mSelected);
     }
 
     /**
@@ -715,7 +716,7 @@ public class ScToggleButton extends View {
 
         state.putString("mGroup", this.mGroup);
         state.putBoolean("mOnlyOneSelected", this.mOnlyOneSelected);
-        state.putBoolean("isSelected", this.isSelected());
+        state.putBoolean("mSelected", this.mSelected);
 
         // Return the new state
         return state;
@@ -762,7 +763,7 @@ public class ScToggleButton extends View {
 
         this.mGroup = savedState.getString("mGroup");
         this.mOnlyOneSelected = savedState.getBoolean("mOnlyOneSelected");
-        this.setSelected(savedState.getBoolean("isSelected"));
+        this.mSelected = savedState.getBoolean("mSelected");
     }
 
 
@@ -879,7 +880,8 @@ public class ScToggleButton extends View {
         }
 
         // Make the selection
-        super.setSelected(selected);
+        this.mSelected = selected;
+        this.invalidate();
         this.manageGroupSelection();
 
         // Group event
@@ -889,6 +891,11 @@ public class ScToggleButton extends View {
         // Button event
         if (this.mChangeListener != null)
             this.mChangeListener.onChanged(this.isSelected());
+    }
+
+    @Override
+    public boolean isSelected() {
+        return this.mSelected;
     }
 
 

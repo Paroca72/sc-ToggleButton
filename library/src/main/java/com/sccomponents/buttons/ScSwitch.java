@@ -232,9 +232,11 @@ public class ScSwitch extends ScToggleButton {
             // Start
             animator.start();
 
-        } else
+        } else {
             // Else force the draw method to calculate the final the position
             this.mCurrentLeftPosition = Integer.MIN_VALUE;
+            this.invalidate();
+        }
     }
 
 

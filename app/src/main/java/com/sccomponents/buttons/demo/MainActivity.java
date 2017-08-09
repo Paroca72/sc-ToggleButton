@@ -15,7 +15,5 @@ public class MainActivity extends AppCompatActivity {
 
         ScSwitch button = (ScSwitch) this.findViewById(R.id.button);
         assert button != null;
-
-        button.setEnabled(false);
     }
 }
