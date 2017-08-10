@@ -780,7 +780,7 @@ public class ScToggleButton extends View {
          *
          * @param the current button status
          */
-        void onChanged(boolean isSelected);
+        void onChanged(View view, boolean isSelected);
 
     }
 
@@ -889,7 +889,7 @@ public class ScToggleButton extends View {
 
         // Button event
         if (this.mChangeListener != null)
-            this.mChangeListener.onChanged(this.isSelected());
+            this.mChangeListener.onChanged(this, this.isSelected());
     }
 
     @Override
