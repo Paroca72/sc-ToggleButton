@@ -10,6 +10,7 @@
         <attr name="italic" format="boolean" />
         <attr name="allCaps" format="boolean" />
         <attr name="showLed" format="boolean" />
+        <attr name="color" format="color" />
         <attr name="ledOnColor" format="color" />
         <attr name="ledOffColor" format="color" />
         <attr name="strokeSize" format="dimension" />
@@ -26,6 +27,8 @@
         <attr name="group" format="string" />
         <attr name="onlyOneSelected" format="boolean" />
         <attr name="filling" />
+        <attr name="source" format="string" />
+        <attr name="volume" format="float" />
     </declare-styleable>
 
     <attr name="align" format="enum">

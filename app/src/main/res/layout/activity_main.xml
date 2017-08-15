@@ -8,17 +8,16 @@
     android:orientation="vertical"
     tools:context="com.sccomponents.buttons.demo.MainActivity">
 
-    <com.sccomponents.buttons.ScSwitch
-        android:id="@+id/button"
+    <com.sccomponents.buttons.ScPlayerButton
+        android:id="@+id/player"
+        android:background="#000000"
+        android:layout_width="36dp"
+        android:layout_height="36dp" />
+
+    <Button
+        android:id="@+id/open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:filling="on"
-        app:ledOnColor="#98000000"
-        app:onColor="#cccccc"
-        app:selected="true"
-        app:textOff="OFF"
-        app:textOffColor="#98000000"
-        app:textOn="ON"
-        app:textOnColor="#ffffff" />
+        android:text="MUSIC" />
 
 </LinearLayout>
