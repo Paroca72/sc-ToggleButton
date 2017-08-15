@@ -810,6 +810,7 @@ public class ScPlayerButton extends View {
             this.mSource = value;
             // Retrieve the new duration
             this.mMediaDuration = this.getMediaDuration(value);
+            this.invalidate();
         }
     }
 
