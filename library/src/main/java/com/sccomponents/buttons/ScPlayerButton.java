@@ -235,14 +235,14 @@ public class ScPlayerButton extends View {
      * - If have hours: HH:MM
      * - If NO have hours: MM:SS
      *
-     * @param duration the duration in milliseconds
+     * @param milliseconds the duration in milliseconds
      * @return the format time
      */
-    private String formatTime(int duration) {
+    private String formatTime(int milliseconds) {
         // Get the tokens
-        int seconds = (duration / 1000) % 60;
-        int minutes = (seconds / 60) % 60;
-        int hours = (seconds / (60 * 60)) % 24;
+        int seconds = (milliseconds / 1000) % 60;
+        int minutes = (milliseconds / (1000 * 60)) % 60;
+        int hours = (milliseconds / (1000 * 60 * 60)) % 24;
 
         // Format
         if (hours == 0)
