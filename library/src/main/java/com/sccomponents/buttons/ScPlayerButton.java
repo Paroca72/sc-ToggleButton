@@ -11,6 +11,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.audiofx.Visualizer;
 import android.net.Uri;
@@ -25,6 +26,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -202,14 +206,16 @@ public class ScPlayerButton extends View {
      */
     private int getMediaDuration(String source) {
         // Try to create the player
-        MediaPlayer player = null;
+        MediaMetadataRetriever retriever = null;
 
         // Check for null values
         if (source != null)
             try {
-                // Try to get the media duration
-                player = MediaPlayer.create(this.getContext(), Uri.parse(source));
-                return player.getDuration();
+                retriever = new MediaMetadataRetriever();
+                retriever.setDataSource(this.getContext(), Uri.parse(source));
+                String durationStr = retriever
+                        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+                return Integer.parseInt(durationStr);
 
             } catch (Exception ex) {
                 // Print the error on the stack and return
@@ -217,8 +223,8 @@ public class ScPlayerButton extends View {
 
             } finally {
                 // Release the player
-                if (player != null)
-                    player.release();
+                if (retriever != null)
+                    retriever.release();
             }
 
         return 0;
@@ -303,7 +309,7 @@ public class ScPlayerButton extends View {
      * @param volume    the player volume
      * @return the new media player
      */
-    private MediaPlayer initMediaPlayer(String mediaPath, float volume) {
+    private MediaPlayer initMediaPlayer(String mediaPath, float volume) throws IOException {
         // Create a new media player object
         MediaPlayer player = MediaPlayer.create(this.getContext(), Uri.parse(mediaPath));
 

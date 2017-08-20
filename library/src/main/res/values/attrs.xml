@@ -3,6 +3,7 @@
 
     <!-- Components -->
     <declare-styleable name="ScButtons">
+        <attr name="async" format="boolean" />
         <attr name="selected" format="boolean" />
         <attr name="fontFamily" format="string" />
         <attr name="fontSize" format="dimension" />
